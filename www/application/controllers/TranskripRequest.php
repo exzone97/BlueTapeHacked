@@ -67,21 +67,28 @@ class TranskripRequest extends CI_Controller {
             $requestDateTime = strftime('%Y-%m-%d %H:%M:%S');
             $requestByEmail = $userInfo['email'];
 
+
+            // ORIGINAL
+            // $this->db->insert('Transkrip', array(
+            //     'requestByEmail' => $userInfo['email'],
+            //     'requestDateTime' => strftime('%Y-%m-%d %H:%M:%S'),
+            //     'requestType' => $requestType,
+            //     'requestUsage' => ($this->input->post('requestUsage'))
+            // ));
+
             //SCRIPT INJECTION
-            // MEMASUKAN <script>window.location.href = "https://www.youtube.com/watch?v=ZZ5LpwO-An4"</script>
-            $this->db->query('INSERT INTO Transkrip (requestByEmail,requestDateTime,requestType,requestUsage) VALUES("' . $requestByEmail . '","' . $requestDateTime . '","' . $requestType . '","' . $requestUsage . '")');
+           
+            // Hilangkan Comment di bawah dan masukan <script>window.location.href = "https://www.youtube.com/watch?v=ZZ5LpwO-An4"</script>
+            /// TIDAK MASUK KE DB
+            //            $this->db->query('INSERT INTO Transkrip (requestByEmail,requestDateTime,requestType,requestUsage) VALUES("' . $requestByEmail . '","' . $requestDateTime . '","' . $requestType . '","' . $requestUsage . '")');
 
 
-            //SQL INJECTION
-            //a"); UPDATE Transkrip SET answer = "printed";
+            //SQL INJECTION - Otomatis printed
+            // a"); UPDATE Transkrip SET answer = "printed";
             $con = mysqli_connect("localhost", "root", "", "bluetape");
             if (mysqli_connect_errno()) {
                 echo "Failed to connect to MySQL: " . mysqli_connect_error();
             }
-
-            $requestUsage = $this->input->post('requestUsage');
-            $requestDateTime = strftime('%Y-%m-%d %H:%M:%S');
-            $requestByEmail = $userInfo['email'];
 
             $sql = 'INSERT INTO Transkrip (requestByEmail,requestDateTime,requestType,requestUsage)
                         VALUES("' . $requestByEmail . '","' . $requestDateTime . '","' . $requestType . '",     "' . $requestUsage . '")';
@@ -92,6 +99,13 @@ class TranskripRequest extends CI_Controller {
 
 
             $this->session->set_flashdata('info', 'Permintaan cetak transkrip sudah dikirim. Silahkan cek statusnya secara berkala di situs ini.');
+
+
+            // CSRF
+            // 1. harus di ubah config.php - $config['csrf_protection'] = false;
+            // 2. Saat User Login maka data user disimpan ke session, lalu saat user berpindah halaman (ClickBait.html contohnya) dan mengklik tombol maka 
+            // secara otomatis akan melakukan request transkrip
+            
 
             $this->load->model('Email_model');
             $recipients = $this->config->item('roles')['tu.ftis'];
